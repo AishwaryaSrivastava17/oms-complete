@@ -20,9 +20,11 @@ public class OrderService { //Spring Beans
 	
 	public String createOrder(Order order) {
 		
-	Float response=	getTaxesTemplate.getForObject("http://localhost:8080/getTaxes?price={price}", Float.class,order.getPrice());
-		Order savedOrder = orderRepository.save(order);
-		System.out.println(response);
+	Float tax=	getTaxesTemplate.getForObject("http://localhost:8080/getTaxes?price={price}", Float.class,order.getPrice());
+	order.getPrice();
+	order.setTax(tax);;
+	Order savedOrder = orderRepository.save(order);
+//		System.out.println(response);
 //		return "order created";
 		return savedOrder.getId();
 	}
