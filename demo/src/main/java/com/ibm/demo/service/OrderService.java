@@ -5,50 +5,54 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import com.ibm.demo.entity.Order;
 import com.ibm.demo.repo.OrderRepository;
 
-
 @Service
-public class OrderService { //Spring Beans
+@Transactional
+public class OrderService { // Spring Beans,singleton design pattern
 	@Autowired
 	OrderRepository orderRepository;
+	
 	@Autowired
 	RestTemplate getTaxesTemplate;
 	
 	public String createOrder(Order order) {
-		
-	Float tax=	getTaxesTemplate.getForObject("http://localhost:8080/getTaxes?price={price}", Float.class,order.getPrice());
-	System.out.println(tax);
-	order.setTax(tax);
-	Order savedOrder = orderRepository.save(order);
-//		return "order created";
+		// call getTaxes
+//		Float tax = getTaxesTemplate.getForObject("http://localhost:8080/getTaxes?price={price}", Float.class,
+//				order.getPrice());
+//		System.out.println(tax);
+//		order.setTax(tax);
+		Order savedOrder = orderRepository.save(order);
+//		if (order != null)  //TODO Only for demonstrating a transaction, remove this before commiting to github.
+//			throw new RuntimeException();
 		return savedOrder.getId();
 	}
 
-public List<Order> getOrders() {
-	return orderRepository.findAll();
+	public List<Order> getOrders() {
+		return orderRepository.findAll();
 	}
-public void updateOrder(Order order) {
-	orderRepository.save(order);
-//	return "order updated";
+
+	public void updateOrder(Order order) {
+		orderRepository.save(order);
+	}
+
+	public void deleteOrder(String orderId) {
+		orderRepository.deleteById(orderId);
+	}
+
+	public Optional<Order> getOrder(String orderId) {
+		return orderRepository.findById(orderId);
+	}
+	public OrderRepository getOrderRepository() {
+		return orderRepository;
+	}
+
+	public void setOrderRepository(OrderRepository orderRepository) {
+		this.orderRepository = orderRepository;
+	}
+
 }
-
-public void deleteOrder(String deleteId) {
-	orderRepository.deleteById(deleteId);
-}
-
-public Optional<Order> getOrder(String orderId) {	
-	return orderRepository.findById(orderId);
-}
-
-//public List<Order> getOrders() {
-//	return new ArrayList<Order>();
-//	return null;
-//}
-
-
-}
- 
